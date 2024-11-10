@@ -105,6 +105,7 @@ namespace BTC
     {
         const long height = prevHeight+1;
         if (header.size() != BTC::GetBlockHeaderSize()) {
+//Log()<< "const QByteArray & header: " << header.size() << " BTC::GetBlockHeaderSize(): " << BTC::GetBlockHeaderSize();
             if (err) *err = QString("Header verification failed for header at height %1: wrong size").arg(height);
             return false;
         }
@@ -120,7 +121,14 @@ namespace BTC
     {
         const long height = prevHeight+1;
         QByteArray header = Serialize(curHdr);
+	// SANDO fix header size
+	if (header.size() > BTC::GetBlockHeaderSize()) {
+	    header.truncate(BTC::GetBlockHeaderSize());
+//Log() << "header size fixed";
+	}
         if (header.size() != BTC::GetBlockHeaderSize()) {
+//Log()<< "QByteArray header = Serialize(curHdr): " << header.size() << " BTC::GetBlockHeaderSize(): " << BTC::GetBlockHeaderSize();
+//Log()<< header.toHex().constData();
             if (err) *err = QString("Header verification failed for header at height %1: wrong size").arg(height);
             return false;
         }
@@ -188,13 +196,14 @@ namespace BTC
         return nameNetMap.value(name, Net::Invalid /* default if not found */);
     }
 
-    namespace { const QString coinNameBCH{"BCH"}, coinNameBTC{"BTC"}, coinNameLTC{"LTC"}; }
+    namespace { const QString coinNameBCH{"BCH"}, coinNameBTC{"BTC"}, coinNameLTC{"LTC"}, coinNameEAC{"EAC"}; }
     QString coinToName(Coin c) {
         QString ret; // for NRVO
         switch (c) {
         case Coin::BCH: ret = coinNameBCH; break;
         case Coin::BTC: ret = coinNameBTC; break;
         case Coin::LTC: ret = coinNameLTC; break;
+        case Coin::EAC: ret = coinNameEAC; break;
         case Coin::Unknown: break;
         }
         return ret;
@@ -203,6 +212,7 @@ namespace BTC
         if (s == coinNameBCH) return Coin::BCH;
         if (s == coinNameBTC) return Coin::BTC;
         if (s == coinNameLTC) return Coin::LTC;
+        if (s == coinNameEAC) return Coin::EAC;
         return Coin::Unknown;
     }
 

@@ -431,6 +431,8 @@ SOURCES += \
     bitcoin/crypto/sha1.cpp \
     bitcoin/crypto/sha256.cpp \
     bitcoin/crypto/sha256_sse4.cpp \
+    bitcoin/crypto/scrypt.cpp \
+    bitcoin/crypto/scrypt-sse2.cpp \
     bitcoin/crypto/sha512.cpp \
     bitcoin/hash.cpp \
     bitcoin/interpreter.cpp \
@@ -465,6 +467,7 @@ HEADERS += \
     bitcoin/crypto/ripemd160.h \
     bitcoin/crypto/sha1.h \
     bitcoin/crypto/sha256.h \
+    bitcoin/crypto/scrypt.h \
     bitcoin/crypto/sha512.h \
     bitcoin/hash.h \
     bitcoin/heapoptional.h \

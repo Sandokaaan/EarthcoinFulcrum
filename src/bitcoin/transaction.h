@@ -223,6 +223,7 @@ inline void UnserializeTransaction(TxType &tx, Stream &s) {
     s >> tx.nVersion;
     tx.vin.clear();
     tx.vout.clear();
+	tx.strTxComment.clear();
     tx.mw_blob.reset();
     /* Try to read the vin. In case the dummy is there, this will be read as an
      * empty vector. */
@@ -263,6 +264,8 @@ inline void UnserializeTransaction(TxType &tx, Stream &s) {
         throw std::ios_base::failure("Unknown transaction optional data");
     }
     s >> tx.nLockTime;
+    if (tx.nVersion > 1)         // SANDO: need an additional condition?
+	    s >> tx.strTxComment;	
 }
 
 template <typename Stream, typename TxType>
@@ -308,6 +311,8 @@ inline void SerializeTransaction(const TxType &tx, Stream &s) {
         s.write(reinterpret_cast<const char *>(tx.mw_blob->data()), tx.mw_blob->size());
     }
     s << tx.nLockTime;
+    if (tx.nVersion > 1)
+	    s << tx.strTxComment;	
 }
 
 /**
@@ -368,7 +373,7 @@ public:
 class CTransaction : public CTransactionBase<CTransaction> {
 public:
     // Default transaction version.
-    static constexpr int32_t CURRENT_VERSION = 2;
+    static constexpr int32_t CURRENT_VERSION = 1;
 
     // Changing the default transaction version requires a two step process:
     // first adapting relay policy by bumping MAX_STANDARD_VERSION, and then
@@ -385,7 +390,8 @@ public:
     const std::vector<CTxIn> vin;
     const std::vector<CTxOut> vout;
     const uint32_t nLockTime;
-
+	const std::string strTxComment;
+	
     const litecoin_bits::MimbleBlobPtr mw_blob; //! Litecoin only
 
 private:
@@ -424,6 +430,7 @@ public:
     std::vector<CTxIn> vin;
     std::vector<CTxOut> vout;
     uint32_t nLockTime;
+	std::string strTxComment;
 
     litecoin_bits::MimbleBlobPtr mw_blob; //! Litecoin only
 

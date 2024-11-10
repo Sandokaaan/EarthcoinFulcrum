@@ -314,6 +314,7 @@ void Controller::startup()
 
 void Controller::on_coinDetected(const BTC::Coin detectedtype)
 {
+
     // NOTE: This runs in the bitcoindmgr thread, and not in our thread. Any operations here should bear that in mind
     // and not touch any local class variables that are not guarded by a lock and/or are not atomic.
     didReceiveCoinDetectionFromBitcoinDMgr.store(true, std::memory_order_relaxed);

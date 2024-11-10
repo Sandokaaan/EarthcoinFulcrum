@@ -100,9 +100,9 @@ std::string CTransactionBase<Derived>::ToString(bool fVerbose) const {
     const auto &me = tx();
     std::string str;
     const std::string classname = std::is_same_v<Derived, CMutableTransaction> ? "CMutableTransaction" : "CTransaction";
-    str += strprintf("%s(txid=%s, ver=%d, vin.size=%u, vout.size=%u, nLockTime=%u)\n",
+    str += strprintf("%s(txid=%s, ver=%d, vin.size=%u, vout.size=%u, nLockTime=%u, strTxComment=%s)\n",
                      classname, me.GetId().ToString().substr(0, cutoff), me.nVersion, me.vin.size(),
-                     me.vout.size(), me.nLockTime);
+                     me.vout.size(), me.nLockTime), (me.strTxComment.length() > 0 ? "YES" : "NO");
     for (const auto &nVin : me.vin) {
         str += "    " + nVin.ToString(fVerbose) + "\n";
     }
@@ -118,10 +118,10 @@ template class CTransactionBase<CMutableTransaction>;
 
 
 CMutableTransaction::CMutableTransaction()
-    : nVersion(CTransaction::CURRENT_VERSION), nLockTime(0) {}
+    : nVersion(CTransaction::CURRENT_VERSION), nLockTime(0), strTxComment("") {}	  
 
 CMutableTransaction::CMutableTransaction(const CTransaction &tx)
-    : nVersion(tx.nVersion), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime), mw_blob(tx.mw_blob) {}
+    : nVersion(tx.nVersion), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime), strTxComment(tx.strTxComment), mw_blob(tx.mw_blob) {}
 
 TxId CMutableTransaction::GetId() const { return TxId(ComputeHash(false)); }
 TxHash CMutableTransaction::GetHash() const { return TxHash(ComputeHash(false)); }
@@ -131,12 +131,12 @@ TxHash CMutableTransaction::GetHash() const { return TxHash(ComputeHash(false));
  * TODO: remove the need for this default constructor entirely.
  */
 CTransaction::CTransaction() noexcept
-    : nVersion{CTransaction::CURRENT_VERSION}, nLockTime{0u} {}
+    : vin(), vout(), nVersion(CTransaction::CURRENT_VERSION), nLockTime(0), strTxComment(""), hash{} {}
 CTransaction::CTransaction(const CMutableTransaction &tx)
-    : nVersion(tx.nVersion), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime), mw_blob(tx.mw_blob),
+    : nVersion(tx.nVersion), vin(tx.vin), vout(tx.vout), nLockTime(tx.nLockTime), strTxComment(tx.strTxComment), mw_blob(tx.mw_blob),
       hash(ComputeHash(false)) {}
 CTransaction::CTransaction(CMutableTransaction &&tx)
-    : nVersion(tx.nVersion), vin(std::move(tx.vin)), vout(std::move(tx.vout)), nLockTime(tx.nLockTime),
+    : nVersion(tx.nVersion), vin(std::move(tx.vin)), vout(std::move(tx.vout)), nLockTime(tx.nLockTime), strTxComment(tx.strTxComment),
       mw_blob(std::move(tx.mw_blob)), hash(ComputeHash(false)) {}
 
 } // end namespace bitcoin

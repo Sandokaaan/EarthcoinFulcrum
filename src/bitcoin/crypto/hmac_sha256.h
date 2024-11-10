@@ -8,6 +8,8 @@
 
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
+
 
 namespace bitcoin {
 
@@ -26,6 +28,12 @@ public:
         return *this;
     }
     void Finalize(uint8_t hash[OUTPUT_SIZE]);
+
+    void Copy(CHMAC_SHA256* dest)
+    {
+        memcpy(dest, this, sizeof(CHMAC_SHA256));
+    }
+
 };
 
 }

@@ -18,6 +18,9 @@
 #include <string>
 #include <vector>
 
+#define BEGIN(a)            ((char*)&(a))
+#define END(a)              ((char*)&((&(a))[1]))
+
 namespace bitcoin  {
 
 /** Used by SanitizeString() */
