@@ -1,0 +1,5 @@
+git clone https://github.com/Sandokaaan/EarthcoinFulcrum
+cd EarthcoinFulcrum
+qmake
+make -j$(nproc)
+
