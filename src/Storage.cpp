@@ -3360,7 +3360,6 @@ void Storage::addBlock(PreProcessedBlockPtr ppb, bool saveUndo, unsigned nReserv
             {
                 QString errMsg;
                 if (!p->headerVerifier(ppb->header, &errMsg) ) {
-Log()<<errMsg;
                     // XXX possible reorg point. Caller will/should roll back the db state via issuing calls to undoLatestBlock()
                     throw HeaderVerificationFailure(errMsg);
                 }
