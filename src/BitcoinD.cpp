@@ -305,9 +305,10 @@ void BitcoinDMgr::refreshBitcoinDNetworkInfo()
                 bitcoinDInfo.hasDSProofRPC = false;
             } // end lock scope
             // be sure to announce whether remote bitcoind is bitcoin core (this determines whether we use segwit or not)
-            BTC::Coin coin = BTC::Coin::BCH; // default BCH if unknown (not segwit)
-            if (res.isCore) coin = BTC::Coin::BTC; // segwit
-            else if (res.isLTC) coin = BTC::Coin::LTC; // segwit
+            // EAC is only coin supported by this version. For BTC, LTC or BCH please use original Fulcrum from https://github.com/cculianu/Fulcrum
+            BTC::Coin coin = BTC::Coin::EAC; 
+            //  if (res.isCore) coin = BTC::Coin::BTC; // disabled
+            //  else if (res.isLTC) coin = BTC::Coin::LTC; // disabled
             emit coinDetected(coin);
             // next, be sure to set up the ping time appropriately for bchd vs bitcoind
             resetPingTimers(int(res.isBchd ? PingTimes::BCHD : PingTimes::Normal));
