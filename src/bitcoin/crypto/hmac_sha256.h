@@ -10,7 +10,6 @@
 #include <cstdlib>
 #include <cstring>
 
-
 namespace bitcoin {
 
 /** A hasher class for HMAC-SHA-256. */
