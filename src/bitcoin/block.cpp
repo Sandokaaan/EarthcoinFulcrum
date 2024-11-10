@@ -1,5 +1,3 @@
-// todo - celé
-
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
@@ -14,16 +12,6 @@
 #include "utilstrencodings.h"
 
 namespace bitcoin {
-
-/*void CBlockHeader::SetAuxpow (std::unique_ptr<CAuxPow> apow) {
-    if (apow != nullptr) {
-        auxpow.reset(apow.release());
-        SetAuxpowFlag(true);
-    } else {
-        auxpow.reset();
-        SetAuxpowFlag(false);
-    }
-}*/
 	
 uint256 CPureBlockHeader::GetHash() const {
     return SerializeHash(*this);
@@ -34,12 +22,6 @@ uint256 CPureBlockHeader::GetPoWHash() const {
     scrypt_1024_1_1_256(BEGIN(nVersion), BEGIN(thash));
     return thash;
 }	
-
-/* //není treba, dedi se
-uint256 CBlockHeader::GetHash() const {
-    return SerializeHash(*this);
-}
-*/
 
 std::string CBlock::ToString(bool fVerbose) const {
     std::stringstream s;
@@ -53,9 +35,5 @@ std::string CBlock::ToString(bool fVerbose) const {
     }
     return s.str();
 }
-
-/// auxpow
-
-
 
 } // end namespace bitcoin
