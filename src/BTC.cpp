@@ -105,7 +105,6 @@ namespace BTC
     {
         const long height = prevHeight+1;
         if (header.size() != BTC::GetBlockHeaderSize()) {
-//Log()<< "const QByteArray & header: " << header.size() << " BTC::GetBlockHeaderSize(): " << BTC::GetBlockHeaderSize();
             if (err) *err = QString("Header verification failed for header at height %1: wrong size").arg(height);
             return false;
         }
@@ -124,11 +123,8 @@ namespace BTC
 	// SANDO fix header size
 	if (header.size() > BTC::GetBlockHeaderSize()) {
 	    header.truncate(BTC::GetBlockHeaderSize());
-//Log() << "header size fixed";
 	}
         if (header.size() != BTC::GetBlockHeaderSize()) {
-//Log()<< "QByteArray header = Serialize(curHdr): " << header.size() << " BTC::GetBlockHeaderSize(): " << BTC::GetBlockHeaderSize();
-//Log()<< header.toHex().constData();
             if (err) *err = QString("Header verification failed for header at height %1: wrong size").arg(height);
             return false;
         }
