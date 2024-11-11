@@ -219,6 +219,16 @@ public:
         SetNull();
     }
 
+    // copy constructor for verif in BTC.cpp
+    CBlockHeader(const CPureBlockHeader & a) {
+        nVersion = a.nVersion;
+        hashPrevBlock = a.hashPrevBlock;
+        hashMerkleRoot = a.hashMerkleRoot;
+        nTime = a.nTime;
+        nBits = a.nBits;
+        nNonce = a.nNonce;
+    }
+
     SERIALIZE_METHODS(CBlockHeader, obj) {
 	READWRITEAS(CPureBlockHeader, obj);
 	if (obj.IsAuxpow()) {
