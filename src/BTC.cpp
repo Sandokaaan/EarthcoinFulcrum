@@ -108,7 +108,7 @@ namespace BTC
             if (err) *err = QString("Header verification failed for header at height %1: wrong size").arg(height);
             return false;
         }
-        bitcoin::CBlockHeader curHdr = Deserialize<bitcoin::CBlockHeader>(header);
+        bitcoin::CBlockHeader curHdr = Deserialize<bitcoin::CPureBlockHeader>(header);
         if (!checkInner(height, curHdr, err))
             return false;
         prevHeight = height;
