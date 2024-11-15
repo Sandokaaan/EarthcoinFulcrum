@@ -1,0 +1,49 @@
+executing config test builtin_clzl
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/builtin_clzl && /usr/lib/qt5/bin/qmake  -spec /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ "CONFIG -= qt debug_and_release app_bundle lib_bundle" /home/eac/github/EarthcoinFulcrum/config.tests/builtin_clzl
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/builtin_clzl && MAKEFLAGS= make
+> g++ -c -pipe -O2 -Wall -Wextra -fPIC  -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -o main.o main.cpp
+> g++ -Wl,-O1 -o test main.o      
+test builtin_clzl succeeded
+executing config test builtin_clzll
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/builtin_clzll && /usr/lib/qt5/bin/qmake  -spec /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ "CONFIG -= qt debug_and_release app_bundle lib_bundle" /home/eac/github/EarthcoinFulcrum/config.tests/builtin_clzll
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/builtin_clzll && MAKEFLAGS= make
+> g++ -c -pipe -O2 -Wall -Wextra -fPIC  -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -o main.o main.cpp
+> g++ -Wl,-O1 -o test main.o      
+test builtin_clzll succeeded
+executing config test endian_big
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/endian_big && /usr/lib/qt5/bin/qmake  -spec /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ "CONFIG -= qt debug_and_release app_bundle lib_bundle" /home/eac/github/EarthcoinFulcrum/config.tests/endian_big
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/endian_big && MAKEFLAGS= make
+> g++ -c -pipe -O2 -Wall -Wextra -fPIC  -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -o main.o main.cpp
+> main.cpp:15:16: error: static assertion failed: Must be little endian
+>    15 | static_assert (false, "Must be little endian");
+>       |                ^~~~~
+> make: *** [Makefile:258: main.o] Error 1
+test endian_big FAILED
+executing config test endian_little
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/endian_little && /usr/lib/qt5/bin/qmake  -spec /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ "CONFIG -= qt debug_and_release app_bundle lib_bundle" /home/eac/github/EarthcoinFulcrum/config.tests/endian_little
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/endian_little && MAKEFLAGS= make
+> g++ -c -pipe -O2 -Wall -Wextra -fPIC  -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -o main.o main.cpp
+> g++ -Wl,-O1 -o test main.o      
+test endian_little succeeded
+executing config test zmq
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/zmq && /usr/lib/qt5/bin/qmake  -spec /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ "CONFIG -= qt debug_and_release app_bundle lib_bundle" /home/eac/github/EarthcoinFulcrum/config.tests/zmq
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/zmq && MAKEFLAGS= make
+> g++ -c -pipe -O2 -std=gnu++1z -isystem /usr/include/mit-krb5 -Wall -Wextra -fPIC  -I. -I/usr/include/pgm-5.3 -I/usr/include/libxml2 -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -o main.o main.cpp
+> g++ -Wl,-O1 -o test main.o   -lzmq   
+test zmq succeeded
+executing config test rocksdb
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/rocksdb && /usr/lib/qt5/bin/qmake  -spec /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ "CONFIG -= qt debug_and_release app_bundle lib_bundle" /home/eac/github/EarthcoinFulcrum/config.tests/rocksdb
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/rocksdb && MAKEFLAGS= make
+> g++ -c -pipe -O2 -std=gnu++1z -Wall -Wextra -fPIC  -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -o main.o main.cpp
+> g++ -Wl,-O1 -o test main.o   -lrocksdb   
+test rocksdb succeeded
+executing config test jemalloc
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/jemalloc && /usr/lib/qt5/bin/qmake  -spec /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ "CONFIG -= qt debug_and_release app_bundle lib_bundle" /home/eac/github/EarthcoinFulcrum/config.tests/jemalloc
++ cd /home/eac/github/EarthcoinFulcrum/config.tests/jemalloc && MAKEFLAGS= make
+> g++ -c -pipe -O2 -Wall -Wextra -fPIC -DJEMALLOC_MANGLE -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -o main.o main.cpp
+> main.cpp:2:10: fatal error: jemalloc/jemalloc.h: No such file or directory
+>     2 | #include <jemalloc/jemalloc.h>
+>       |          ^~~~~~~~~~~~~~~~~~~~~
+> compilation terminated.
+> make: *** [Makefile:258: main.o] Error 1
+test jemalloc FAILED

@@ -18,6 +18,7 @@
 //
 #include "App.h"
 #include "BTC.h"
+#include "BTC_Address.h"
 #include "ByteView.h"
 #include "CostCache.h"
 #include "CoTask.h"
@@ -2465,6 +2466,17 @@ void Storage::loadCheckHeadersInDB()
     p->headersFile = std::make_unique<RecordFile>(options->datadir + QDir::separator() + "headers", size_t(p->blockHeaderSize()), 0x00f026a1); // may throw
 
     Log() << "Verifying headers ...";
+
+BTC::Address a("eZhyPZSKpe2F4XmygonpDZTbzwvc8vHyWA");
+Log() << a.toString(true) << " isValid? " << a.isValid() << " compatible? " << a.isCompatibleWithNet(BTC::Net::MainNet) << " kind: " << a.kind();
+Log() << a.toString(false) << " isValid? " << a.isValid() << " compatible? " << a.isCompatibleWithNet(BTC::Net::MainNet) << " kind: " << a.kind();
+BTC::Address b("ESXZcmxerPx4ZreAXyPfKTCzffZuwL1iUi");
+Log() << b.toString(true) << " isValid? " << b.isValid() << " compatible? " << b.isCompatibleWithNet(BTC::Net::MainNet) << " kind: " << b.kind();
+Log() << b.toString(false) << " isValid? " << b.isValid() << " compatible? " << b.isCompatibleWithNet(BTC::Net::MainNet) << " kind: " << b.kind();
+BTC::Address c("eac1qfm060qxmtuelpe2azsdh97n8py728dq9n2kxp9");
+Log() << c.toString(true) << " isValid? " << c.isValid() << " compatible? " << c.isCompatibleWithNet(BTC::Net::MainNet) << " kind: " << c.kind();
+Log() << c.toString(false) << " isValid? " << c.isValid() << " compatible? " << c.isCompatibleWithNet(BTC::Net::MainNet) << " kind: " << c.kind();
+
     uint32_t num = unsigned(p->headersFile->numRecords());
     std::vector<QByteArray> hVec;
     const auto t0 = Util::getTimeNS();
@@ -4126,6 +4138,7 @@ static auto GetMaxHistoryCtrFunc(const QString &name, const QString &itemName, s
 auto Storage::getHistory(const HashX & hashX, bool conf, bool unconf, BlockHeight fromHeight,
                          std::optional<BlockHeight> optToHeight) const -> History
 {
+Log() << "Storage::getHistory ";
     History ret;
     if (hashX.length() != HashLen)
         return ret;
@@ -4134,6 +4147,7 @@ auto Storage::getHistory(const HashX & hashX, bool conf, bool unconf, BlockHeigh
     try {
         SharedLockGuard g(p->blocksLock);  // makes sure history doesn't mutate from underneath our feet
         if (conf) {
+Log() << "Storage::getHistory - conf ";
             static const QString err("Error retrieving history for a script hash");
             auto nums_opt = GenericDBGet<TxNumVec>(p->db.shist.get(), hashX, true, err, false, p->db.defReadOpts);
             if (nums_opt.has_value()) {
@@ -4159,6 +4173,7 @@ auto Storage::getHistory(const HashX & hashX, bool conf, bool unconf, BlockHeigh
             }
         }
         if (unconf) {
+Log() << "Storage::getHistory - unconf ";
             auto [mempool, lock] = this->mempool();
             if (auto it = mempool.hashXTxs.find(hashX); it != mempool.hashXTxs.end()) {
                 const auto & txvec = it->second;

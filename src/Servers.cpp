@@ -1467,9 +1467,9 @@ void Server::rpc_blockchain_relayfee(Client *c, const RPC::BatchId batchId, cons
 //      below for boilerplate checking & parsing.
 HashX Server::parseFirstAddrParamToShCommon(const RPC::Message &m, QString *addrStrOut) const
 {
-    if (isNonBCH())
-        // unsupported on non-BCH (for now)
-        throw RPCError("blockchain.address.* methods are only available on BCH", RPC::ErrorCodes::Code_MethodNotFound);
+//    if (isNonBCH())
+//        // unsupported on non-BCH (for now)
+//        throw RPCError("blockchain.address.* methods are only available on BCH", RPC::ErrorCodes::Code_MethodNotFound);
     const auto net = srvmgr->net();
     if (UNLIKELY(net == BTC::Net::Invalid))
         // This should never happen in practice, but it pays to be paranoid.
@@ -1590,6 +1590,7 @@ void Server::impl_get_first_use(Client *c, const RPC::BatchId batchId, const RPC
 /// QVariantMap suitable for placing into the resulting response.
 QVariantList ServerBase::getHistoryCommon(const HashX &sh, bool mempoolOnly, const GetHistory_FromToBH &fromTo)
 {
+Log()<< "ServerBase::getHistoryCommon : mempoolOnly " << mempoolOnly;
     QVariantList resp;
     const bool includeConfirmed = !mempoolOnly;
     const bool includeMempool = mempoolOnly || !fromTo.second.has_value();
@@ -1638,6 +1639,7 @@ void Server::rpc_blockchain_scripthash_get_history(Client *c, const RPC::BatchId
 void Server::rpc_blockchain_address_get_history(Client *c, const RPC::BatchId batchId, const RPC::Message &m)
 {
     const auto sh = parseFirstAddrParamToShCommon(m);
+Log() << "Server::rpc_blockchain_address_get_history " << sh.toHex();
     const auto fromTo = parseFromToBlockHeightCommon(m);
     impl_get_history(c, batchId, m, sh, fromTo);
 }

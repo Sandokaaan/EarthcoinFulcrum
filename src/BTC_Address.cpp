@@ -48,24 +48,26 @@ namespace BTC
     namespace {
         // Hash of Net -> [Hash of VerByte -> Kind]
         const QHash<Net, QHash<quint8, Address::Kind> > netVerByteKindMap = {
-            { MainNet,      { {0, Address::P2PKH }, {5, Address::P2SH} } },
+            { MainNet,      { {93, Address::P2PKH }, {33, Address::P2SH} } },
             { TestNet,    { {111, Address::P2PKH }, {196, Address::P2SH} } },
             { TestNet4,   { {111, Address::P2PKH }, {196, Address::P2SH} } },
             { ScaleNet,   { {111, Address::P2PKH }, {196, Address::P2SH} } },
             { ChipNet,    { {111, Address::P2PKH }, {196, Address::P2SH} } },
             { RegTestNet, { {111, Address::P2PKH }, {196, Address::P2SH} } },
         };
+
         Byte verByteForNetAndKind(Net net, Address::Kind kind) {
             if (kind == Address::TOKEN_P2PKH) kind = Address::P2PKH; // hack to support TOKEN_P2PKH
             else if (kind == Address::TOKEN_P2SH) kind = Address::P2SH; // hack to support TOKEN_P2SH
             if (const auto map = netVerByteKindMap.value(net); LIKELY(!map.isEmpty())) {
                 for (auto it = map.begin(); it != map.end(); ++it) {
                     if (it.value() == kind)
-                        return it.key();
+                        return it.key();       /// toto je asi ono!
                 }
             }
             return Address::InvalidVerByte;
         }
+
         Address::Kind kindForNetAndVerByte(Net net, Byte verByte) {
             if (const auto map = netVerByteKindMap.value(net); LIKELY(!map.isEmpty())) {
                 for (auto it = map.begin(); it != map.end(); ++it) {
@@ -75,6 +77,7 @@ namespace BTC
             }
             return Address::Kind::Invalid;
         }
+
         /// NB: This won't ever auto-detect regtest since it has the same verBytes as testnet (111 & 196).  Since
         /// between the two choices, testnet is the much more likely network anybody using this software will be using,
         /// we always return testnet if the verByte matches regtest and/or testnet.
@@ -120,6 +123,8 @@ namespace BTC
     /*static*/
     Address Address::fromString(const QString &legacyOrCash)
     {
+// Zde detekci podle prefixu ?
+
         static const auto DecodeCash = [] (Address & a, const std::string &ss) -> bool {
             using PN = std::pair<const std::string &, const Net>;
             a._net = Net::Invalid;
@@ -258,8 +263,9 @@ namespace BTC
     /// if !isValid: Returns the empty string.
     QString Address::toString(bool legacy, std::optional<Byte> verByteOverride) const {
         QString ret;
+/// tady vlastni detekci
         if (isValid()) {
-            if (legacy) {
+            if (legacy || _kind<2) {   // SANDO 
                 std::vector<Byte> vch;
                 vch.reserve(1 + size_t(_hash.size()));
                 vch.push_back(verByteOverride.value_or(verByte));
@@ -270,10 +276,6 @@ namespace BTC
                 switch (_net) {
                 case Net::MainNet:    prefix = &bitcoin::MainNetChainParams.cashaddrPrefix; break;
                 case Net::TestNet:    prefix = &bitcoin::TestNetChainParams.cashaddrPrefix; break;
-                case Net::TestNet4:   prefix = &bitcoin::TestNet4ChainParams.cashaddrPrefix; break;
-                case Net::ScaleNet:   prefix = &bitcoin::ScaleNetChainParams.cashaddrPrefix; break;
-                case Net::ChipNet:    prefix = &bitcoin::ChipNetChainParams.cashaddrPrefix; break;
-                case Net::RegTestNet: prefix = &bitcoin::RegTestNetChainParams.cashaddrPrefix; break;
                 case Net::Invalid:    break;
                 }
                 if (prefix) {
