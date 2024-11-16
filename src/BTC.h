@@ -193,7 +193,7 @@ namespace BTC
         return cs.size() > 0 && *cs.begin() == bitcoin::opcodetype::OP_RETURN;
     }
 
-    inline QByteArray HashXFromByteView(const ByteView &bv) { return BTC::HashRev(bv.toByteArray(false), true); }
+    QByteArray HashXFromByteView(const ByteView &bv);   // SANDO: must do a full implementation in BTC.cpp to fix missing coinbase transactions 
     inline QByteArray HashXFromCScript(const bitcoin::CScript &cs) { return HashXFromByteView(cs); }
 
     /// Header Chain Verifier -
