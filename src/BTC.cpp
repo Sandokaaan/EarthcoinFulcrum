@@ -17,6 +17,7 @@
 // <https://www.gnu.org/licenses/>.
 //
 #include "BTC.h"
+#include "BTC_Address.h"
 #include "Common.h"
 #include "Util.h"
 
@@ -60,6 +61,16 @@ namespace BTC
         Tests::Base58(true, true);
     }
 
+    //SANDO: fix missing coinbase transactions
+    QByteArray HashXFromByteView(const ByteView &bv) {
+        QByteArray ba = bv.toByteArray(false);
+        char firstByte = ba.at(0);
+        if (firstByte == 33 || firstByte == 65) { // legacy pay-to-pubKey transaction (coinbase)
+            BTC::Address address = BTC::Address::fromPubKey(ba.mid(1, firstByte), BTC::Address::P2PKH, BTC::Net::MainNet);
+            return address.toHashX();
+        }
+        return BTC::HashRev(bv.toByteArray(false), true);
+    }
 
     namespace Tests {
         bool Base58(bool silent, bool throws) { return bitcoin::TestBase58(silent, throws); }
