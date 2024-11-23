@@ -288,11 +288,8 @@ struct CBlockLocator {
     std::vector<uint256> vHave;
 
     // compilation fix for older compillers
-    #if __cplusplus >= 201103L
-        constexpr CBlockLocator() noexcept {}
-    #else
-        CBlockLocator() {}
-    #endif
+    // constexpr CBlockLocator() noexcept {}
+    CBlockLocator() noexcept {}
 
     explicit CBlockLocator(const std::vector<uint256> &vHaveIn)
         : vHave(vHaveIn) {}
