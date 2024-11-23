@@ -122,11 +122,8 @@ public:
     static constexpr int SEQUENCE_LOCKTIME_GRANULARITY = 9;
 
     // compilation fix for older compillers
-    #if __cplusplus >= 201103L
-        constexpr CTxIn() noexcept : nSequence{SEQUENCE_FINAL} {}
-    #else
-        CTxIn() noexcept : nSequence{SEQUENCE_FINAL} {}
-    #endif    
+    //constexpr CTxIn() noexcept : nSequence{SEQUENCE_FINAL} {}
+    CTxIn() noexcept : nSequence{SEQUENCE_FINAL} {}
 
     explicit CTxIn(const COutPoint &prevoutIn, const CScript &scriptSigIn = {}, uint32_t nSequenceIn = SEQUENCE_FINAL)
         : prevout{prevoutIn}, scriptSig{scriptSigIn}, nSequence{nSequenceIn} {}
