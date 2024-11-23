@@ -125,7 +125,7 @@ public:
     #if __cplusplus >= 201103L
         constexpr CTxIn() noexcept : nSequence{SEQUENCE_FINAL} {}
     #else
-        CTxIn() : nSequence{SEQUENCE_FINAL} {}
+        CTxIn() noexcept : nSequence{SEQUENCE_FINAL} {}
     #endif    
 
     explicit CTxIn(const COutPoint &prevoutIn, const CScript &scriptSigIn = {}, uint32_t nSequenceIn = SEQUENCE_FINAL)
