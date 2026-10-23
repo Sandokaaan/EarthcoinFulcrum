@@ -371,6 +371,9 @@ public:
     /// the /debug HTTP endpoint.
     UTXOSetStats calcUTXOSetStats(const DumpProgressFunc & = {}, size_t progInterval = 100000) const;
 
+    // sando - buildRichList
+    QVariantList buildRichList() const;
+
     // --- Initial synch support ---
 
     /// Leverages RAII to have the Storage class auto-notified when initial sync has started & ended.
