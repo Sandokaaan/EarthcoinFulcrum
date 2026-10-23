@@ -429,6 +429,7 @@ private:
     /* / */
     // utxo
     void rpc_blockchain_utxo_get_info(Client *, RPC::BatchId, const RPC::Message &); // fully implemented
+    void rpc_blockchain_utxo_rich(Client *, RPC::BatchId, const RPC::Message &); // devel
     // mempool
     void rpc_mempool_get_fee_histogram(Client *, RPC::BatchId, const RPC::Message &); // fully implemented
     // daemon
