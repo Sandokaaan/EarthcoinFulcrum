@@ -31,6 +31,9 @@
 #include "SubsMgr.h"
 #include "VarInt.h"
 
+#include <iomanip>  // For std::setw and std::setfill
+#include <sstream>  // For std::stringstream
+
 #include "bitcoin/crypto/endian.h"
 #include "bitcoin/hash.h"
 
@@ -4477,10 +4480,12 @@ auto Storage::listUnspent(const HashX & hashX, const TokenFilterOption tokenFilt
 
 auto Storage::getBalance(const HashX &hashX, TokenFilterOption tokenFilter) const -> std::pair<bitcoin::Amount, bitcoin::Amount>
 {
+Log()<<"!!Storage::getBalance";
     std::pair<bitcoin::Amount, bitcoin::Amount> ret;
     if (hashX.length() != HashLen)
         return ret;
     auto ShouldFilter = [tokenFilter](const bitcoin::token::OutputDataPtr & p) { return ShouldTokenFilter(tokenFilter, p); };
+Log()<<"!!!ShouldFilter ";
     auto IncrementCtrAndThrowIfExceedsMaxHistory = GetMaxHistoryCtrFunc("GetBalance UTXOs",
                                                                         QString("scripthash %1").arg(QString(hashX.toHex())),
                                                                         options->maxHistory);
@@ -4507,6 +4512,8 @@ auto Storage::getBalance(const HashX &hashX, TokenFilterOption tokenFilter) cons
                     throw InternalError(QString("Out-of-range amount in db for ctxo %1: %2").arg(ctxo.toString()).arg(amount / amount.satoshi()));
                 if ( ! ShouldFilter(tokenDataPtr)) {
                     ret.first += amount; // tally the result
+                } else {
+Log()<<"!!!! FILTERED";
                 }
             }
             if (UNLIKELY(!bitcoin::MoneyRange(ret.first))) {
@@ -4793,6 +4800,79 @@ size_t Storage::dumpAllScriptHashes(QIODevice *outDev, unsigned int indent, unsi
     if (progFunc && ctr % progInterval)
         progFunc(ctr); // always called for last item to indicate operation ended
     return ctr;
+}
+
+std::string SliceToHex(const rocksdb::Slice& slice) {
+    std::stringstream ss;
+    for (size_t i = 0; i < slice.size(); ++i) {
+        ss << std::hex << std::setw(2) << std::setfill('0') << (int)(unsigned char)slice[i];
+    }
+    return ss.str();
+}
+
+QVariantList Storage::buildRichList() const
+{
+// sando
+Log() << "!!!!---we are here - let us search unspets...";
+    // data-structure for address balance sorting
+    struct UInfo {
+	int64_t balance;
+	uint64_t txNum;
+	uint32_t txIndex;
+    };
+    // return structure
+    QVariantList rts;
+    // check open database
+    FatalAssert(!!p->db.shunspent, __func__, ": Shunspent db is not open");
+    // get all unspent transactions fro the database
+    std::unique_ptr<rocksdb::Iterator> iter(p->db.shunspent->NewIterator(p->db.defReadOpts));
+    if (!iter) throw DatabaseError("Unable to obtain an iterator to the scripthash unspent db");
+    // create map utxos for balance sumarizing
+    std::map<HashX, UInfo> addrInfos;
+    constexpr auto errMsg = "This may be due to either a database format mismatch or data corruption."
+                            "\n\nDelete the datadir and resynch to bitcoind.\n";
+    // calculate total balances for each address
+    for (iter->SeekToFirst(); iter->Valid(); iter->Next()) {
+        const auto key = iter->key();
+        const auto &[hashx, ctxo] = extractShunspentKey(key);
+        if (!ctxo.isValid())
+            throw DatabaseError(QString("Read an invalid compact txo from the scripthash_unspent database."));
+        SHUnspentValue shuval = Deserialize<SHUnspentValue>(FromSlice(iter->value()));
+        if (UNLIKELY(!shuval.valid || !bitcoin::MoneyRange(shuval.amount)))
+            throw DatabaseError(QString("Read an invalid SHUnspentValue from the scripthash_unspent database for scripthash: %1. %2")
+                 .arg(QString(hashx.toHex()), errMsg));
+        int64_t amount = shuval.amount/bitcoin::SATOSHI;  // need cast class Amount to simple int64_t
+	if (!addrInfos[hashx].balance) {  // update transaction detals only for the first seen of and address
+	    addrInfos[hashx].txNum = ctxo.txNum();
+	    addrInfos[hashx].txIndex = ctxo.N();
+	}
+        addrInfos[hashx].balance += amount;
+    }
+    // Sord addresses by total balance
+    std::vector<std::pair<HashX, UInfo>> sortedBalances(addrInfos.begin(), addrInfos.end());
+    std::sort(sortedBalances.begin(), sortedBalances.end(), [](const auto& a, const auto& b) {
+        return b.second.balance < a.second.balance;
+    });
+    // Create JSON output
+    // Show top 10
+    int zzstop = 0;
+    int withBalance = 0;
+    for (const auto& [hashx, addrInfo] : sortedBalances) {
+	QVariantMap item;
+        if (zzstop++ < 10)
+	{
+	    item["balance"] = qlonglong(addrInfo.balance);
+	    item["txHash"] = hashForTxNum(addrInfo.txNum, false, nullptr, false).value().toHex();
+	    item["txIndex"] = qlonglong(addrInfo.txIndex);
+	    rts.push_back(item);
+	    //rts[hashx.toHex()] = item;
+	}
+        //    Log() << zzstop << ". " << addrInfo.balance << " in tx " << hashForTxNum(addrInfo.txNum, false, nullptr, false).value().toHex() << " / " << addrInfo.txIndex;
+        if (addrInfo.balance > 0)
+          withBalance++;
+    }
+    Log() << "addresses: " << zzstop << " hodlers: " << withBalance;
+    return rts;
 }
 
 auto Storage::calcUTXOSetStats(const DumpProgressFunc & progFunc, size_t progInterval) const -> UTXOSetStats
