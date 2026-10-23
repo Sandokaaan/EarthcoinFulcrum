@@ -1538,6 +1538,7 @@ void Server::rpc_blockchain_address_get_balance(Client *c, const RPC::BatchId ba
 
 QVariantMap ServerBase::getBalanceCommon(const HashX &sh, Storage::TokenFilterOption tokenFilter)
 {
+Log()<< "!ServerBase::getBalanceCommon ";
     const auto [amt, uamt] = storage->getBalance(sh, tokenFilter);
     /* Note: ElectrumX protocol docs are incorrect. They claim a string in coin units is returned here.
      * It is not. Instead a number in satoshis is returned!
@@ -2286,6 +2287,14 @@ void Server::rpc_blockchain_utxo_get_info(Client *c, const RPC::BatchId batchId,
     });
 }
 
+//SANDO devel
+void Server::rpc_blockchain_utxo_rich(Client *c, const RPC::BatchId batchId, const RPC::Message &m)
+{
+    generic_do_async(c, batchId, m.id, [this] {
+        return storage->buildRichList();
+    });
+}
+
 /* -- RPA -- */
 QVariantList Server::getRpaHistoryCommon(const Rpa::Prefix & prefix, bool mempoolOnly, const GetHistory_FromToBH fromTo)
 {
@@ -2478,6 +2487,7 @@ HEY_COMPILER_PUT_STATIC_HERE(Server::StaticData::registry){
     { {"blockchain.transaction.dsproof.unsubscribe", true,      false,    PR{1,1},                    },          MP(rpc_blockchain_transaction_dsproof_unsubscribe) },
     // /DSPROOF
     { {"blockchain.utxo.get_info",          true,               false,    PR{2,2},                    },          MP(rpc_blockchain_utxo_get_info) },
+    { {"blockchain.utxo.rich",              true,               false,    PR{0,0},                    },          MP(rpc_blockchain_utxo_rich) },
 
     // RPA
     { {"blockchain.rpa.get_history",        true,               false,    PR{2,3},                    },          MP(rpc_blockchain_rpa_get_history) },
